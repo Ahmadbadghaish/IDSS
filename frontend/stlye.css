@@ -1,0 +1,76 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    color: #333;
+  }
+  
+  #container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Increase the min-width for larger subpages */
+    gap: 20px; /* Optional: increase gap to keep a balanced layout */
+    margin-top: 20px; /* Optional: just to give some space from the top */
+  }
+  
+  .subpage {
+    background-color: #fff;
+    padding: 30px; /* Increased padding to make a larger content area */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 5px; 
+    transition: box-shadow 0.3s ease;
+    overflow: hidden; 
+    position: relative; 
+    /* Additional: setting a minimum height can help keep a consistent size */
+    min-height: 200px; /* Or whatever minimum size is preferred */
+  }
+  .subpage:hover {
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  }
+  
+  .content {
+    display: none; /* content is hidden by default */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    /* Optional: Add any additional styling you prefer for the hidden content */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 5px 5px;
+    background-color: #f4f4f4; /* a light grey background */
+    padding: 10px;
+    box-sizing: border-box; /* to make sure padding doesn't add up to the width */
+    z-index: 100; /* to make sure it stays on top of other elements */
+  }
+  
+  .redirectBtn {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8em;
+    transition: background-color 0.3s ease;
+  }
+  
+  .redirectBtn:hover {
+    background-color: #0056b3;
+  }
+  
+  
+  
+  #addBtn {
+    padding: 10px 30px;
+    cursor: pointer;
+    background-color: #28a745; /* A pleasant green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+  }
+  
+  
