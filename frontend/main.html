@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subpages</title>
+    <title>Big-5</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1 class="header-title">Subpages</h1>
+        <h1 class="header-title">Big-5</h1>
         <nav>
-            <ul class="nav-list">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="#portfolio">Portfolio</a></li>
-            </ul>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+            <a href="#">Portfolio</a>
+            <div class="animation start-home"></div>
         </nav>
     </header>
 
-    <div id="container">
-    </div>
+    <div id="container"></div>
 
     <div id="instructions" class="instructions">
         <p>Click "Add" to create a new subpage. Click on a subpage to view its content.</p>
@@ -33,15 +31,36 @@
 <section id="services" class="content-section center-content colored-section">
     <div class="content-container">
         <h2>Our Services</h2>
-        <ul>
-            <li>one</li>
-            <li>two</li>
-            <li>three</li>
-            <li>four</li>
-        </ul>
+        <div class="row1-container">
+            <div class="box box-down cyan">
+              <h2>Big-5 test</h2>
+              <p>The test find the strong and weakness of the user</p>
+              <img src="https://assets.codepen.io/2301174/icon-supervisor.svg" alt="">
+            </div>
+        
+            <div class="box red">
+              <h2>Team Builder</h2>
+              <p>Scans our talent network to create the optimal team for your project</p>
+              <img src="https://assets.codepen.io/2301174/icon-team-builder.svg" alt="">
+            </div>
+        
+            <div class="box box-down blue">
+              <h2>Marriage</h2>
+              <p>find your match wife</p>
+              <img src="https://assets.codepen.io/2301174/icon-calculator.svg" alt="">
+            </div>
+          </div>
+          <div class="row2-container">
+            <div class="box orange">
+              <h2>Dorm</h2>
+              <p>Find the best collage roommate</p>
+              <img src="https://assets.codepen.io/2301174/icon-karma.svg" alt="">
+            </div>
+          </div>
     </div>
 </section>
 
+<br>
 
     <section id="contact" class="content-section center-content">
         <div class="contact-container">
@@ -50,7 +69,10 @@
             <button id="contactBtn" class="contact-button">Contact Us</button>
         </div>
     </section>
-
+    <p class="end">
+        By <span>Team 1</span>
+      </p>
+    
     <script src="function.js"></script>
 </body>
 </html>
