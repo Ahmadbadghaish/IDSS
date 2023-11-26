@@ -138,7 +138,7 @@ nav .start-contact, a:nth-child(5):hover~.animation {
   margin-bottom: 5px;
 }
 
-.add-button, .contact-button {
+.add-button, .contact-button, .join-button {
   background-color: #2c3e50;
   color: #ffffff;
   padding: 10px 20px;
@@ -149,7 +149,7 @@ nav .start-contact, a:nth-child(5):hover~.animation {
   cursor: pointer;
 }
 
-.add-button:hover, .contact-button:hover {
+.add-button:hover, .contact-button:hover, .join-button:hover {
   background-color: #1abc9c;
 }
 
@@ -296,4 +296,19 @@ h2 {
       width: 30%;
   }
   
+}
+
+.join-button {
+  background-color: #2c3e50;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  float:center;
+
+}
+
+.join-button :hover {
+  background-color: #1abc9c;
 }
