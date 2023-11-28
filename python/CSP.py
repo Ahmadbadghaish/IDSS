@@ -1,39 +1,89 @@
 from constraint import Problem
 
-# Define a simple CSP for team assignments
 
-# Assuming you have a list of all people called all_people and a specified number of teams
-team_count = 5  # Change as needed
-teams = range(1, team_count + 1)
+class Person:
+    def __init__(self, id, neuroticism, extroversion, openness, agreeableness, conscientiousness, major):
+        self.id = id
+        self.scores = {
+            'Neuroticism': neuroticism,
+            'Extroversion': extroversion,
+            'Openness': openness,
+            'Agreeableness': agreeableness,
+            'Conscientiousness': conscientiousness
+        }
+        # Add logic to determine the level based on scores
+        self.levels = {trait: self.determine_level(score) for trait, score in self.scores.items()}
+        self.major = major
 
-# Initialize problem
-problem = Problem()
+    def determine_level(self, score):
+        # Dummy implementation, replace with your own logic
+        if score > 60:
+            return 'High'
+        elif score > 40:
+            return 'Medium'
+        else:
+            return 'Low'
 
-# Variables: For each person, we set their domain to be any of the teams
-for person in all_people:
-    problem.addVariable(person.id, teams)
 
-# Constraints
-# 1. No two persons with High on a given trait can be in the same team
-for trait in ['Neuroticism', 'Extroversion', 'Openness', 'Agreeableness', 'Conscientiousness']:
-    high_trait_persons = [person for person in all_people if person.levels[trait] == 'High']
-    
-    for i in range(len(high_trait_persons)):
-        for j in range(i+1, len(high_trait_persons)):
-            problem.addConstraint(lambda i, j: i != j, (high_trait_persons[i].id, high_trait_persons[j].id))
+# Function to set up and solve the CSP
+def solve_csp(all_people, group_size=5):
+    problem = Problem()
 
-# You can add more constraints as needed
+    # Calculate the number of groups needed
+    num_students = len(all_people)
+    group_count = -(-num_students // group_size)  # Ceiling division
 
-# Solve
-solutions = problem.getSolutions()
+    # Assign groups (1 to group_count)
+    groups = range(1, group_count + 1)
 
-# Note: The above will give all possible solutions. If you want only one solution, you can simply use:
-# solution = problem.getSolution()
+    # Set each student's domain to be any of the groups
+    for person in all_people:
+        problem.addVariable(person.id, groups)
 
-if solutions:
-    print("One of the possible team assignments:")
-    for person_id, team in solutions[0].items():
-        print(f"Person ID {person_id} is in Team {team}")
+    # Constraint: No two students with 'High' on the same trait in the same group
+    for trait in ['Neuroticism', 'Extroversion', 'Openness', 'Agreeableness', 'Conscientiousness']:
+        high_trait_students = [person for person in all_people if person.levels[trait] == 'High']
+        
+        for i in range(len(high_trait_students)):
+            for j in range(i+1, len(high_trait_students)):
+                problem.addConstraint(lambda x, y: x != y, (high_trait_students[i].id, high_trait_students[j].id))
+
+    # Get one solution
+    solution = problem.getSolution()
+
+    if solution:
+        print(solution)
+        return solution
+    else:
+        return "No solutions found!"
+
+
+
+
+import csv
+
+all_people = []
+
+with open('C:\\Users\\badgh\\Desktop\\IDSS\\generated_data.csv', mode='r') as file:
+    csv_reader = csv.DictReader(file)
+    for row in csv_reader:
+        person = Person(
+            id=row['ID'],
+            neuroticism=float(row['neuroticism_scores']),
+            extroversion=float(row['extroversion_scores']),
+            openness=float(row['openness_scores']),
+            agreeableness=float(row['agreeableness_scores']),
+            conscientiousness=float(row['conscientiousness_scores']),
+            major=row['major']
+        )
+        all_people.append(person)
+
+
+group_assignment = solve_csp(all_people)
+
+if group_assignment != "No solutions found!":
+    # Output the group assignments in a more readable format
+    for person_id, group in group_assignment.items():
+        print(f"Person ID {person_id} is in Group {group}")
 else:
-    print("No solutions found!")
-
+    print(group_assignment)
