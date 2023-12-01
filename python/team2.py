@@ -3,9 +3,19 @@ import pandas as pd
 import random
 from collections import Counter
 
-def initialize_population(pop_size, student_count, team_count):
-    """Initialize a population with random team assignments."""
-    return [np.random.choice(range(team_count), student_count) for _ in range(pop_size)]
+def initialize_population(pop_size, student_count, team_count, min_team_size, max_team_size):
+    """Initialize a population with team assignments within size constraints."""
+    population = []
+    for _ in range(pop_size):
+        individual = []
+        for team in range(team_count):
+            team_size = random.randint(min_team_size, max_team_size)
+            individual.extend([team] * team_size)
+        individual = individual[:student_count]  # Trim if exceeds student count
+        random.shuffle(individual)
+        population.append(individual)
+    return population
+
 
 def team_composition(individual, students_df):
     """Evaluate the team composition based on roles, majors, and GPA."""
@@ -24,16 +34,21 @@ def team_composition(individual, students_df):
     for team in team_roles:
         balance_score += len(set(team_roles[team].values())) - 1  # More unique counts, less balance
         balance_score += len(set(team_majors[team].values())) - 1
-        balance_score += abs(np.mean(team_gpa[team]) - students_df['GPA'].mean())
-
+        if team_gpa[team]:
+            balance_score += abs(np.mean(team_gpa[team]) - students_df['GPA'].mean())
     return balance_score
 
-def fitness(individual, students_df):
-    """Calculate the fitness of an individual. Lower is better (more balanced teams)."""
-    return team_composition(individual, students_df)
+def fitness(individual, students_df, min_team_size, max_team_size):
+    """Calculate the fitness of an individual with penalty for size constraint violation."""
+    team_sizes = Counter(individual)
+    size_penalty = sum(abs(min_team_size - size) + abs(size - max_team_size) for size in team_sizes.values() if not (min_team_size <= size <= max_team_size))
+    
+    balance_score = team_composition(individual, students_df)
+    return balance_score + size_penalty
 
-def evolve(population, students_df, retain=0.2, random_select=0.05, mutate=0.01):
-    graded = [(fitness(x, students_df), x) for x in population]
+
+def evolve(population, students_df, team_count, min_team_size, max_team_size, retain=0.2, random_select=0.05, mutate=0.01):
+    graded = [(fitness(x, students_df, min_team_size, max_team_size), x) for x in population]
     graded = [x[1] for x in sorted(graded, key=lambda x: x[0])]
     retain_length = int(len(graded)*retain)
     parents = graded[:retain_length]
@@ -54,11 +69,16 @@ def evolve(population, students_df, retain=0.2, random_select=0.05, mutate=0.01)
         child = np.concatenate((male[:half], female[half:]))
         children.append(child)
 
-    # Mutate some individuals
+    # Mutation with team size check
     for individual in children:
         if mutate > random.random():
-            pos_to_mutate = random.randint(0, len(individual)-1)
-            individual[pos_to_mutate] = random.randint(0, 5)
+            team_counts = Counter(individual)
+            team_to_reduce = random.choice([team for team in team_counts if team_counts[team] > min_team_size])
+            team_to_increase = random.choice([team for team in team_counts if team_counts[team] < max_team_size])
+            for i, team in enumerate(individual):
+                if team == team_to_reduce:
+                    individual[i] = team_to_increase
+                    break
 
     parents.extend(children)
     return parents
@@ -71,18 +91,21 @@ student_count = len(students_df)  # Total number of students
 team_count = 20                   # Number of teams
 pop_size = 100                   # Population size
 
-# Initialize population
-population = initialize_population(pop_size, student_count, team_count)
+min_team_size = 4  # Example minimum team size
+max_team_size = 6  # Example maximum team size
+
+# Initialize population with the specified team size range
+population = initialize_population(pop_size, student_count, team_count, min_team_size, max_team_size)
 
 # Evolve the population
-for i in range(300):
-    population = evolve(population, students_df)
-    best_individual = min(population, key=lambda ind: fitness(ind, students_df))
-    best_fitness = fitness(best_individual, students_df)
+for i in range(100):
+    population = evolve(population, students_df, team_count, min_team_size, max_team_size)
+    best_individual = min(population, key=lambda ind: fitness(ind, students_df, min_team_size, max_team_size))
+    best_fitness = fitness(best_individual, students_df, min_team_size, max_team_size)
     print(f"Generation {i+1}: Best Fitness = {best_fitness}")
 
 # Identify and print the best team distribution after the final evolution
-best_individual = min(population, key=lambda ind: fitness(ind, students_df))
+best_individual = min(population, key=lambda ind: fitness(ind, students_df, min_team_size, max_team_size))
 best_teams = Counter(best_individual)
 print("Best Team Distribution:", best_teams)
 
