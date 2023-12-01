@@ -63,22 +63,13 @@ def evolve(population, students_df, retain=0.2, random_select=0.05, mutate=0.01)
     parents.extend(children)
     return parents
 
-# Example usage with student data
-student_count = 30  # Total number of students
-team_count = 6     # Number of teams
-pop_size = 100     # Population size
+# Read CSV file into DataFrame
+students_df = pd.read_csv('generated_data_GPA_role.csv')
 
-# Sample student data (expand as needed)
-student_data = {
-    "ID": range(1, 31),
-    "neuroticism_scores": np.random.randint(1, 100, 30),
-    # ... (include all other attributes here)
-    "GPA": np.random.uniform(2.0, 4.0, 30),
-    "role_in_project": np.random.choice(['executor', 'innovator', 'collaborator'], 30),
-    "major": np.random.choice(['ISE', 'SWE', 'ICS'], 30)
-}
-
-students_df = pd.DataFrame(student_data)
+# Assuming your CSV file is correctly formatted, you can use the DataFrame directly
+student_count = len(students_df)  # Total number of students
+team_count = 6                   # Number of teams
+pop_size = 100                   # Population size
 
 # Initialize population
 population = initialize_population(pop_size, student_count, team_count)
@@ -100,3 +91,11 @@ for team in range(team_count):
     team_members = students_df.iloc[np.where(np.array(best_individual) == team)]
     print(f"\nTeam {team + 1} Members:")
     print(team_members)
+
+# Add the team number to the DataFrame
+best_teams = np.array(best_individual) + 1  # Adding 1 to make team numbers start from 1
+students_df['Team_Number'] = best_teams
+
+# Save the updated DataFrame to a new CSV file
+students_df.to_csv('updated_student_data_with_teams.csv', index=False)
+print("Updated data saved to 'updated_student_data_with_teams.csv'")
