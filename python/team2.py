@@ -9,9 +9,9 @@ def initialize_population(pop_size, student_count, team_count):
 
 def team_composition(individual, students_df):
     """Evaluate the team composition based on roles, majors, and GPA."""
-    team_roles = {team: Counter() for team in range(6)}
-    team_majors = {team: Counter() for team in range(6)}
-    team_gpa = {team: [] for team in range(6)}
+    team_roles = {team: Counter() for team in range(20)}
+    team_majors = {team: Counter() for team in range(20)}
+    team_gpa = {team: [] for team in range(20)}
 
     for student_idx, team in enumerate(individual):
         student = students_df.iloc[student_idx]
@@ -68,14 +68,14 @@ students_df = pd.read_csv('generated_data_GPA_role.csv')
 
 # Assuming your CSV file is correctly formatted, you can use the DataFrame directly
 student_count = len(students_df)  # Total number of students
-team_count = 6                   # Number of teams
+team_count = 20                   # Number of teams
 pop_size = 100                   # Population size
 
 # Initialize population
 population = initialize_population(pop_size, student_count, team_count)
 
 # Evolve the population
-for i in range(100):
+for i in range(300):
     population = evolve(population, students_df)
     best_individual = min(population, key=lambda ind: fitness(ind, students_df))
     best_fitness = fitness(best_individual, students_df)
