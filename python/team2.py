@@ -121,13 +121,6 @@ for team in range(team_count):
     print(team_members)
 
 
-# Plotting the fitness over generations
-plt.plot(fitness_over_generations)
-plt.title('Fitness Over Generations')
-plt.xlabel('Generation')
-plt.ylabel('Best Fitness')
-plt.show()
-
 if len(best_individual) == len(students_df):
     best_teams = np.array(best_individual) + 1  # Teams start from 1
 else:
@@ -141,3 +134,11 @@ students_df['Team_Number'] = best_teams
 # Save the updated DataFrame to a new CSV file
 students_df.to_csv('updated_student_data_with_teams.csv', index=False)
 print("Updated data saved to 'updated_student_data_with_teams.csv'")
+
+
+# Plotting the fitness over generations
+plt.plot(fitness_over_generations)
+plt.title('Fitness Over Generations')
+plt.xlabel('Generation')
+plt.ylabel('Best Fitness')
+plt.show()
