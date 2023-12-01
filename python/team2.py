@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import random
 from collections import Counter
+import matplotlib.pyplot as plt
+
 
 def initialize_population(pop_size, student_count, team_count, min_team_size, max_team_size):
     """Initialize a population with team assignments within size constraints."""
@@ -97,12 +99,15 @@ max_team_size = 6  # Example maximum team size
 # Initialize population with the specified team size range
 population = initialize_population(pop_size, student_count, team_count, min_team_size, max_team_size)
 
+fitness_over_generations = []
+
 # Evolve the population
-for i in range(100):
+for i in range(50):
     population = evolve(population, students_df, team_count, min_team_size, max_team_size)
     best_individual = min(population, key=lambda ind: fitness(ind, students_df, min_team_size, max_team_size))
     best_fitness = fitness(best_individual, students_df, min_team_size, max_team_size)
     print(f"Generation {i+1}: Best Fitness = {best_fitness}")
+    fitness_over_generations.append(best_fitness)
 
 # Identify and print the best team distribution after the final evolution
 best_individual = min(population, key=lambda ind: fitness(ind, students_df, min_team_size, max_team_size))
@@ -114,6 +119,14 @@ for team in range(team_count):
     team_members = students_df.iloc[np.where(np.array(best_individual) == team)]
     print(f"\nTeam {team + 1} Members:")
     print(team_members)
+
+
+# Plotting the fitness over generations
+plt.plot(fitness_over_generations)
+plt.title('Fitness Over Generations')
+plt.xlabel('Generation')
+plt.ylabel('Best Fitness')
+plt.show()
 
 # Add the team number to the DataFrame
 best_teams = np.array(best_individual) + 1  # Adding 1 to make team numbers start from 1
