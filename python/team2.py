@@ -1,83 +1,102 @@
+import numpy as np
 import pandas as pd
 import random
-from deap import base, creator, tools, algorithms
-# from scipy.stats import variance
-import numpy as np
+from collections import Counter
 
+def initialize_population(pop_size, student_count, team_count):
+    """Initialize a population with random team assignments."""
+    return [np.random.choice(range(team_count), student_count) for _ in range(pop_size)]
 
-# Person class
-class Person:
-    def __init__(self, identifier, scores):
-        self.id = identifier
-        self.scores = scores  # scores is a dictionary of trait scores
+def team_composition(individual, students_df):
+    """Evaluate the team composition based on roles, majors, and GPA."""
+    team_roles = {team: Counter() for team in range(6)}
+    team_majors = {team: Counter() for team in range(6)}
+    team_gpa = {team: [] for team in range(6)}
 
-# Fitness Function
-def evaluate(individual, all_people, num_teams):
-    team_scores = {i: 0 for i in range(num_teams)}
-    team_counts = {i: 0 for i in range(num_teams)}
+    for student_idx, team in enumerate(individual):
+        student = students_df.iloc[student_idx]
+        team_roles[team][student['role_in_project']] += 1
+        team_majors[team][student['major']] += 1
+        team_gpa[team].append(student['GPA'])
 
-    # Aggregate scores for each team
-    for person_idx, team in enumerate(individual):
-        team_scores[team] += all_people[person_idx].scores['Extroversion']
-        team_counts[team] += 1
+    # Evaluate team balance
+    balance_score = 0
+    for team in team_roles:
+        balance_score += len(set(team_roles[team].values())) - 1  # More unique counts, less balance
+        balance_score += len(set(team_majors[team].values())) - 1
+        balance_score += abs(np.mean(team_gpa[team]) - students_df['GPA'].mean())
 
-    # Calculate variance of average scores
-    avg_scores = [team_scores[i] / team_counts[i] if team_counts[i] > 0 else 0 for i in range(num_teams)]
-    score_variance = np.var(avg_scores)
+    return balance_score
 
-    # Minimize the variance
-    return -score_variance,
+def fitness(individual, students_df):
+    """Calculate the fitness of an individual. Lower is better (more balanced teams)."""
+    return team_composition(individual, students_df)
 
-# Reading data from Excel file
-def load_data_from_excel(file_path):
-    df = pd.read_excel(file_path)
-    all_people = []
-    for _, row in df.iterrows():
-        identifier = row['ID']
-        scores = {'Extroversion': row['Extroversion']}  # Add more traits if available
-        all_people.append(Person(identifier, scores))
-    return all_people
+def evolve(population, students_df, retain=0.2, random_select=0.05, mutate=0.01):
+    graded = [(fitness(x, students_df), x) for x in population]
+    graded = [x[1] for x in sorted(graded, key=lambda x: x[0])]
+    retain_length = int(len(graded)*retain)
+    parents = graded[:retain_length]
 
-file_path = 'adjusted_results.xlsx'  # Replace with your file path
-all_people = load_data_from_excel(file_path)
+    # Randomly add other individuals to promote genetic diversity
+    for individual in graded[retain_length:]:
+        if random_select > random.random():
+            parents.append(individual)
 
-# GA parameters
-num_individuals = len(all_people)
-num_teams = 5  # Adjust as needed
+    # Crossover parents to create children
+    desired_length = len(population) - len(parents)
+    children = []
+    while len(children) < desired_length:
+        male_idx, female_idx = random.sample(range(len(parents)), 2)
+        male = parents[male_idx]
+        female = parents[female_idx]
+        half = len(male) // 2
+        child = np.concatenate((male[:half], female[half:]))
+        children.append(child)
 
-# Genetic Algorithm Setup
-creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-creator.create("Individual", list, fitness=creator.FitnessMax)
-toolbox = base.Toolbox()
-toolbox.register("attr_team", random.randint, 0, num_teams - 1)
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_team, n=num_individuals)
-toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-toolbox.register("evaluate", evaluate, all_people=all_people, num_teams=num_teams)
-toolbox.register("mate", tools.cxOnePoint)
-toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.05)
-toolbox.register("select", tools.selTournament, tournsize=3)
+    # Mutate some individuals
+    for individual in children:
+        if mutate > random.random():
+            pos_to_mutate = random.randint(0, len(individual)-1)
+            individual[pos_to_mutate] = random.randint(0, 5)
 
-# Running the Genetic Algorithm
-def run_ga():
-    pop = toolbox.population(n=50)
-    hof = tools.HallOfFame(1)
-    stats = tools.Statistics(lambda ind: ind.fitness.values)
-    stats.register("avg", np.mean)
-    stats.register("min", np.min)
-    stats.register("max", np.max)
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=50, stats=stats, halloffame=hof)
-    return pop, log, hof
+    parents.extend(children)
+    return parents
 
-pop, log, hof = run_ga()
+# Example usage with student data
+student_count = 30  # Total number of students
+team_count = 6     # Number of teams
+pop_size = 100     # Population size
 
-# Best solution
-best_team_assignment = hof[0]
+# Sample student data (expand as needed)
+student_data = {
+    "ID": range(1, 31),
+    "neuroticism_scores": np.random.randint(1, 100, 30),
+    # ... (include all other attributes here)
+    "GPA": np.random.uniform(2.0, 4.0, 30),
+    "role_in_project": np.random.choice(['executor', 'innovator', 'collaborator'], 30),
+    "major": np.random.choice(['ISE', 'SWE', 'ICS'], 30)
+}
 
-# Assign individuals to teams based on the best solution
-teams = {i: [] for i in range(num_teams)}
-for person_idx, team in enumerate(best_team_assignment):
-    teams[team].append(all_people[person_idx])
+students_df = pd.DataFrame(student_data)
 
-# Output the team assignments
-for team, members in teams.items():
-    print(f"Team {team}: {[person.id for person in members]}")
+# Initialize population
+population = initialize_population(pop_size, student_count, team_count)
+
+# Evolve the population
+for i in range(100):
+    population = evolve(population, students_df)
+    best_individual = min(population, key=lambda ind: fitness(ind, students_df))
+    best_fitness = fitness(best_individual, students_df)
+    print(f"Generation {i+1}: Best Fitness = {best_fitness}")
+
+# Identify and print the best team distribution after the final evolution
+best_individual = min(population, key=lambda ind: fitness(ind, students_df))
+best_teams = Counter(best_individual)
+print("Best Team Distribution:", best_teams)
+
+# Optionally, print detailed information about each team
+for team in range(team_count):
+    team_members = students_df.iloc[np.where(np.array(best_individual) == team)]
+    print(f"\nTeam {team + 1} Members:")
+    print(team_members)
