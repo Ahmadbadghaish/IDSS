@@ -128,8 +128,14 @@ plt.xlabel('Generation')
 plt.ylabel('Best Fitness')
 plt.show()
 
-# Add the team number to the DataFrame
-best_teams = np.array(best_individual) + 1  # Adding 1 to make team numbers start from 1
+if len(best_individual) == len(students_df):
+    best_teams = np.array(best_individual) + 1  # Teams start from 1
+else:
+    print("Mismatch in team assignments. Assigning remaining students randomly.")
+    best_teams = np.array(best_individual[:len(students_df)]) + 1
+    for _ in range(len(students_df) - len(best_individual)):
+        best_teams = np.append(best_teams, random.randint(1, team_count))
+
 students_df['Team_Number'] = best_teams
 
 # Save the updated DataFrame to a new CSV file
