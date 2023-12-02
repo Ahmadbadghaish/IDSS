@@ -11,7 +11,7 @@ app.get("/", (req, res, next)=>{
     };
      
  
-    PythonShell.run('python_test.py', options, function (err, result){
+    PythonShell.run('team2.py', options, function (err, result){
           if (err) throw err;
           console.log('result: ', result.toString());
           res.send(result.toString())
