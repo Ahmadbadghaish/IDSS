@@ -1,15 +1,11 @@
 const express=require('express');
 const app=express();
+let  router = express.Router()
 const fs = require('fs');
 const {PythonShell} =require('python-shell');
 let filledarray=[]
-let  router = express.Router()
 
-router.use(express.static(__dirname));
 
-router.get('/upload',(req, res) => {
-    res.sendFile(__dirname + '/upload.html')
-})
 
 router.post('/upload', (req, res, next)=>{
     
