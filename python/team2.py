@@ -102,7 +102,7 @@ population = initialize_population(pop_size, student_count, team_count, min_team
 fitness_over_generations = []
 
 # Evolve the population
-for i in range(50):
+for i in range(5000):
     population = evolve(population, students_df, team_count, min_team_size, max_team_size)
     best_individual = min(population, key=lambda ind: fitness(ind, students_df, min_team_size, max_team_size))
     best_fitness = fitness(best_individual, students_df, min_team_size, max_team_size)
