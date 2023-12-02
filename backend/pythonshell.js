@@ -2,6 +2,8 @@ const express=require('express');
 const app=express();
 const fs = require('fs');
 const {PythonShell} =require('python-shell');
+let filledarray=[]
+
 
 router.use(express.static('public'));
 router.use('/css', express.static(__dirname + 'public/style.css'))
@@ -14,18 +16,27 @@ router.get("/upload",(req, res) => {
 })
 
 router.post("/upload", (req, res, next)=>{
-
-let pyshell = new PythonShell('team2.py', { mode: 'json' },function  (err, results));
- 
+    
 fs.createReadStream(req)
 .pipe(csv())
 .on('data', (row) => {
-   pyshell.send(row);
+filledarray.push(row)
 })
-res.send(results)
+.on('end', () => {
+console.log('s');
+});
+    
+let options = {
+  mode: 'text',
+  pythonOptions: ['-u'], 
+  args: [   JSON.stringify(filledarray)]
+};
+ 
+PythonShell.run('team2.py', options, function (err, results) {
+  res.send(results)
 });
  
-const port=8000;
-app.listen(port, ()=>console.log(`Server connected to ${port}`));
+
+});
 
 module.exports = router
