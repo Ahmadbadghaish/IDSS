@@ -8,6 +8,7 @@ const router = express.Router();
 router.use(express.static(__dirname));
 
 router.get("/upload",(req, res) => {
+
     res.sendFile(__dirname + '/upload.html')
 })
 
