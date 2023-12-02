@@ -26,7 +26,7 @@ majors = generate_majors(majors_list, num_individuals)
 gpas = generate_gpas(2.0, 4.0, num_individuals)  # Generating GPAs
 
 # Writing data to a CSV file
-filename = 'generated_dataGPA.csv'
+filename = 'data_scores_GPA_major.csv'
 with open(filename, mode='w', newline='') as file:
     writer = csv.writer(file)
     # Write the header
