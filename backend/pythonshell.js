@@ -7,12 +7,12 @@ const router = express.Router();
 
 router.use(express.static(__dirname));
 
-router.get("/upload",(req, res) => {
+router.get('/upload',(req, res) => {
 
     res.sendFile(__dirname + '/upload.html')
 })
 
-router.post("/upload", (req, res, next)=>{
+router.post('/upload', (req, res, next)=>{
     
 fs.createReadStream(req)
 .pipe(csv())
