@@ -4,16 +4,16 @@ const fs = require('fs');
 const {PythonShell} =require('python-shell');
 
 
-app.get("/", (req, res, next)=>{
+app.post("/upload", (req, res, next)=>{
 
-let pyshell = new PythonShell('team2.py', { mode: 'json' });
+let pyshell = new PythonShell('team2.py', { mode: 'json' },function  (err, results));
  
-fs.createReadStream('data.csv')
+fs.createReadStream(req)
 .pipe(csv())
 .on('data', (row) => {
    pyshell.send(row);
 })
-
+res.send(results)
 });
  
 const port=8000;
