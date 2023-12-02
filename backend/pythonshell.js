@@ -5,15 +5,10 @@ const {PythonShell} =require('python-shell');
 let filledarray=[]
 const router = express.Router();
 
-
-router.use(express.static('public'));
-router.use('/css', express.static(__dirname + 'public/style.css'))
-router.use('/js', express.static(__dirname + 'public/function.js'))
-router.use('/css', express.static(__dirname + 'public/style2.css'))
-router.use('/js', express.static(__dirname + 'public/scripts.js'))
+router.use(express.static(__dirname));
 
 router.get("/upload",(req, res) => {
-    res.render('upload.html')
+    res.sendFile(__dirname + '/upload.html')
 })
 
 router.post("/upload", (req, res, next)=>{
