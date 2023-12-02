@@ -3,12 +3,11 @@ const app=express();
 const fs = require('fs');
 const {PythonShell} =require('python-shell');
 let filledarray=[]
-const router = express.Router();
+let  router = express.Router()
 
 router.use(express.static(__dirname));
 
 router.get('/upload',(req, res) => {
-
     res.sendFile(__dirname + '/upload.html')
 })
 
