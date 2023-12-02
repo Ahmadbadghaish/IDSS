@@ -3,6 +3,15 @@ const app=express();
 const fs = require('fs');
 const {PythonShell} =require('python-shell');
 
+app.use(express.static('public'));
+app.use('/css', express.static(__dirname + 'public/style.css'))
+app.use('/js', express.static(__dirname + 'public/function.js'))
+app.use('/css', express.static(__dirname + 'public/style2.css'))
+app.use('/js', express.static(__dirname + 'public/scripts.js'))
+
+app.get("/upload",(req, res) => {
+    res.render('upload.html')
+})
 
 app.post("/upload", (req, res, next)=>{
 
