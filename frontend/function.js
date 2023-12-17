@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const redirectBtn = document.createElement('a');
     redirectBtn.textContent = 'Go to page';
-    redirectBtn.href = 'http://www.example.com'; // Update the URL
+    redirectBtn.href = 'upload.html'; // Update the URL
     redirectBtn.classList.add('redirectBtn');
     redirectBtn.target = '_blank';
 
