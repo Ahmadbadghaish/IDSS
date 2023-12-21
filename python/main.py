@@ -56,6 +56,8 @@ def fitness(individual, students_df, min_team_size, max_team_size):
     size_penalty = sum(abs(min_team_size - size) + abs(size - max_team_size) for size in team_sizes.values() if not (min_team_size <= size <= max_team_size))
     
     balance_score = team_composition(individual, students_df)
+    print(balance_score)
+
     return balance_score + size_penalty
 
 
